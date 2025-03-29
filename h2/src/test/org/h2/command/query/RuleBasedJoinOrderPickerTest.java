@@ -118,17 +118,8 @@ public class RuleBasedJoinOrderPickerTest {
 
     @Test
     public void bestOrder_twoTablesSingleJoin(){
-        Expression locationsAndCustomers = new Comparison(
-                Comparison.EQUAL,
-                locationsLocationId,
-                customersLocationId,
-                false);
-
-        Expression fullCondition = new ConditionAndOrN(ConditionAndOr.AND,
-                List.of(
-                        locationsAndCustomers
-                )
-        );
+        Expression fullCondition = Mockito.mock(Expression.class);
+        Mockito.when(fullCondition.toString()).thenReturn("(locations.LOCATIONS_ID = customers.LOCATIONS_ID)");
 
         TableFilter locationsFilter = new TableFilter(mockSession, locationsTable, "locations", true, null, 0, null);
         locationsFilter.setFullCondition(fullCondition);
@@ -149,13 +140,10 @@ public class RuleBasedJoinOrderPickerTest {
 
     @Test
     public void bestOrder_threeTablesMultipleJoins(){
-        Expression fullCondition = new ConditionAndOrN(ConditionAndOr.AND,
-                List.of(
-                        new Comparison(Comparison.EQUAL, locationsLocationId, customersLocationId, false),
-                        new Comparison(Comparison.EQUAL, locationsLocationId, ordersLocationId, false),
-                        new Comparison(Comparison.EQUAL, customersCustomerId, ordersCustomerId, false)
-                )
-        );
+        Expression fullCondition = Mockito.mock(Expression.class);
+        Mockito.when(fullCondition.toString()).thenReturn("((locations.LOCATION_ID = customers.LOCATION_ID)\nAND " +
+                "(locations.LOCATION_ID = orders.LOCATION_ID)\nAND " +
+                "(customers.CUSTOMER_ID = orders.CUSTOMER_ID))\n");
 
         TableFilter locationsFilter = new TableFilter(mockSession, locationsTable, "locations", true, null, 0, null);
         locationsFilter.setFullCondition(fullCondition);
@@ -179,17 +167,25 @@ public class RuleBasedJoinOrderPickerTest {
 
     @Test
     public void bestOrder_fourTablesMultipleJoins(){
-        Expression fullCondition = new ConditionAndOrN(ConditionAndOr.AND,
-                List.of(
-                        new Comparison(Comparison.EQUAL, locationsLocationId, customersLocationId, false),
-                        new Comparison(Comparison.EQUAL, locationsLocationId, ordersLocationId, false),
-                        new Comparison(Comparison.EQUAL, customersCustomerId, ordersCustomerId, false),
-                        new Comparison(Comparison.EQUAL, orderLinesLocationId, locationsLocationId, false),
-                        new Comparison(Comparison.EQUAL, orderLinesOrderId, ordersOrderId, false),
-                        new Comparison(Comparison.EQUAL, orderLinesCustomerId, customersCustomerId, false)
-                )
-        );
+//        Expression fullCondition = new ConditionAndOrN(ConditionAndOr.AND,
+//                List.of(
+//                        new Comparison(Comparison.EQUAL, locationsLocationId, customersLocationId, false),
+//                        new Comparison(Comparison.EQUAL, locationsLocationId, ordersLocationId, false),
+//                        new Comparison(Comparison.EQUAL, customersCustomerId, ordersCustomerId, false),
+//                        new Comparison(Comparison.EQUAL, orderLinesLocationId, locationsLocationId, false),
+//                        new Comparison(Comparison.EQUAL, orderLinesOrderId, ordersOrderId, false),
+//                        new Comparison(Comparison.EQUAL, orderLinesCustomerId, customersCustomerId, false)
+//                )
+//        );
+        Expression fullCondition = Mockito.mock(Expression.class);
+        String conditionString = "((locations.LOCATION_ID = customers.LOCATION_ID)\nAND " +
+                "(locations.LOCATION_ID = orders.LOCATION_ID)\nAND " +
+                "(customers.CUSTOMER_ID = orders.CUSTOMER_ID)\nAND " +
+                "(orderLines.LOCATION_ID = locations.LOCATION_ID)\nAND " +
+                "(orderLines.ORDER_ID = orders.ORDER_ID)\nAND " +
+                "(orderLines.CUSTOMER_ID = customers.CUSTOMER_ID))";
 
+        Mockito.when(fullCondition.toString()).thenReturn(conditionString);
         TableFilter locationsFilter = new TableFilter(mockSession, locationsTable, "locations", true, null, 0, null);
         locationsFilter.setFullCondition(fullCondition);
 

@@ -26,7 +26,6 @@ public class RuleBasedJoinOrderPicker {
         List<TableFilter> tableFilterList = new ArrayList<>(Arrays.asList(filters));
 
 
-//        Arrays.sort(filtersSorted, (a, b) -> Long.compare(a.getTable().getRowCountApproximation(session), b.getTable().getRowCountApproximation(session)));
         String conditionString = "";
         if (filters.length > 0) {
             TableFilter temp = filters[0];
@@ -44,7 +43,6 @@ public class RuleBasedJoinOrderPicker {
         while (matcher.find()) {
             String conditionInsideParentheses = matcher.group(1);   // only get inside of parenthesis
             conditions.add(conditionInsideParentheses);
-//            System.out.println("Condition added: " + conditionInsideParentheses);
         }
 
         List<TableFilter> toRevisit = new ArrayList<>();                   // store Cartesian products here
@@ -65,7 +63,6 @@ public class RuleBasedJoinOrderPicker {
                     }
                     if (condition.contains(tableName) &&  condition.contains(tableNamePrev)) {
                         conditionSatisfied = true;
-//                        System.out.println("Conditions is satisfied: " + conditionSatisfied);
                         break;
                     }
                 }
@@ -74,28 +71,16 @@ public class RuleBasedJoinOrderPicker {
                 conditionSatisfied = true;
             }
             if (conditionSatisfied) {
-//                System.out.println("Filter: " + tableName + " is in " + conditionString);
                 list[insertIndex] = tableFilterList.get(0);
                 insertIndex++;
                 tableFilterList.remove(0);
             } else {
-//                System.out.println("Filter: " + tableName + " is NOT in " + conditionString);
                 TableFilter temp = tableFilterList.get(0);
                 tableFilterList.remove(0);
                 tableFilterList.add(temp);
             }
         }
 
-        // add remaining tables back
-//        for (TableFilter filter : toRevisit) {
-//            list[insertIndex] = filter;
-//            insertIndex++;
-//        }
-
-
-        for (int i = 0; i < list.length; i++) {
-            System.out.println(list[i]);
-        }
         return list;
     }
 }
